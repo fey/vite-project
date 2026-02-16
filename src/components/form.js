@@ -1,9 +1,9 @@
 /**
  * @constructor
  */
-export const createTaskForm = () => {
+export const createTaskForm = (formState) => {
   const form = document.createElement('form')
-  form.id = 'create-task-form'
+  form.id = 'task-form'
 
   const label = document.createElement('label')
   label.innerText = 'Add task'
@@ -14,6 +14,7 @@ export const createTaskForm = () => {
   input.name = 'title'
   input.placeholder = 'buy a milk...'
   input.id = 'task-title'
+  input.value = formState.value
 
   const submit = document.createElement('button')
   submit.name = 'submit'

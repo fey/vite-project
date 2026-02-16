@@ -1,47 +1,53 @@
 import { createTaskForm } from './components/form'
 import { createTasksList } from './components/tasksList'
 
-const tasks = []
+const state = {
+  taskId: 1,
+  form: {
+    value: '',
+    valid: undefined,
+  },
+  tasks: [],
+}
 
-/**
- *
- * @param {SubmitEvent} e
- */
+/** @param {SubmitEvent} e */
 const handleSubmit = (e) => {
   e.preventDefault()
 
-  /**
-   * @type {HTMLFormElement}
-   */
-  const form = e.target
-  form.elements['submit'].disabled = true
-
-  const formData = new FormData(form)
+  const formData = new FormData(e.target)
   const title = formData.get('title')
 
-  tasks.push({ title })
+  state.taskId++
+  state.tasks.push({ title, id: state.taskId })
 
-  console.table(tasks)
-  form.elements['submit'].disabled = false
+  render()
+}
+
+/** @param {ChangeEvent} e */
+const handleInput = (e) => {
+  state.createForm.value = e.target.value
+}
+
+const render = () => {
+  const root = document.getElementById('app')
+  root.innerHTML = ''
+
+  /** @type HTMLFormElement */
+  const form = createTaskForm(state.form)
+
+  /** @type {HTMLInputElement} */
+  const titleInput = form.elements.title
+  titleInput.addEventListener('input', handleInput)
+
+  form.addEventListener('submit', handleSubmit)
+  root.appendChild(form)
+
+  const tasksList = createTasksList(state.tasks)
+  root.appendChild(tasksList)
 }
 
 const initApp = () => {
-  const root = document.getElementById('app')
-
-  /** @type HTMLFormElement */
-  const form = createTaskForm()
-
-  root.appendChild(form)
-
-  form.addEventListener('submit', handleSubmit)
-
-  const tasksList = createTasksList([
-    { title: 'jopa' },
-    { title: 'lala' },
-    { title: 'kek' },
-  ])
-
-  root.appendChild(tasksList)
+  render()
 }
 
 export default initApp
