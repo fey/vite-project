@@ -74,7 +74,7 @@ const handleInput = (e) => {
 const handleClick = (e) => {
   e.preventDefault()
 
-  const taskElement = e.target.closest([`[data-type="task"]`])
+  const taskElement = e.target.closest('[data-type="task"]')
   const id = Number(taskElement.dataset.id)
 
   const { tasks } = state
