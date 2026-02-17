@@ -63,10 +63,9 @@ const markTaskCompleted = (id) => {
 
 /** @param {InputEvent} e */
 const handleInput = (e) => {
-  console.log('jopaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
   state.formState.value = e.target.value
   state.formState.isValid = undefined
-  state.formState.error = 'jopaaaaaaaaaaaaaaaa'
+  state.formState.error = null
   render()
 }
 
@@ -166,7 +165,6 @@ const renderForm = () => {
     helperTextElement.innerText = formState.error
   }
   else if (formState.isValid === true) {
-    console.log('JOPAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
     titleElement.ariaInvalid = false
     helperTextElement.innerText = 'Success'
   }
