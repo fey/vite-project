@@ -2,6 +2,7 @@ const ui = {
   form: null,
   tasksList: null,
   historyList: null,
+  progress: null,
 }
 const state = {
   formState: {
