@@ -1,13 +1,21 @@
-import { createTaskForm } from './components/form'
-import { createTasksList } from './components/tasksList'
-
+const ui = {
+  form: null,
+  tasksList: null,
+  historyList: null,
+}
 const state = {
-  taskId: 1,
-  form: {
+  formState: {
     value: '',
-    valid: undefined,
+    isValid: undefined,
+    error: null,
   },
+  taskNextId: 1,
   tasks: [],
+  history: [],
+}
+
+const findTask = (tasks, id) => {
+  return tasks.find(task => task.id === id)
 }
 
 /** @param {SubmitEvent} e */
@@ -17,36 +25,183 @@ const handleSubmit = (e) => {
   const formData = new FormData(e.target)
   const title = formData.get('title')
 
-  state.taskId++
-  state.tasks.push({ title, id: state.taskId })
+  if (title === '') {
+    state.formState.isValid = false
+    state.formState.error = 'Title should be filled'
+  }
+  else {
+    state.formState.isValid = true
+    state.formState.error = null
+    addTask({ title })
+  }
 
   render()
 }
 
-/** @param {ChangeEvent} e */
+const addTask = (taskData) => {
+  state.tasks.push({ ...taskData, id: state.taskNextId })
+  state.taskNextId++
+  state.formState.value = ''
+  state.formState.isValid = true
+  state.formState.error = null
+
+  state.history.push('task added')
+}
+
+const markTaskCompleted = (id) => {
+  const { tasks, history } = state
+
+  const task = findTask(tasks, id)
+
+  if (!task) {
+    return
+  }
+
+  task.isCompleted = true
+  history.push('task completed')
+}
+
+/** @param {InputEvent} e */
 const handleInput = (e) => {
-  state.createForm.value = e.target.value
+  console.log('jopaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+  state.formState.value = e.target.value
+  state.formState.isValid = undefined
+  state.formState.error = 'jopaaaaaaaaaaaaaaaa'
+  render()
+}
+
+/** @param {PointerEvent} e */
+const handleClick = (e) => {
+  e.preventDefault()
+
+  const taskElement = e.target.closest([`[data-type="task"]`])
+  const id = Number(taskElement.dataset.id)
+
+  const { tasks } = state
+  const task = findTask(tasks, id)
+
+  if (task.isCompleted) {
+    return
+  }
+
+  if (!confirm('Mark task as finished?')) {
+    return
+  }
+
+  markTaskCompleted(id)
+  render()
+}
+
+const renderTasks = () => {
+  ui.tasksList.innerHTML = ''
+
+  if (state.tasks.length === 0) {
+    ui.tasksList.innerHTML = '<p>Tasks list is empty</p>'
+  }
+
+  const { tasks } = state
+
+  tasks.forEach((task) => {
+    const element = document.createElement('li')
+    element.style.listStyleType = 'none'
+    element.dataset.id = task.id
+    element.dataset.type = 'task'
+    element.id = `task-${task.id}`
+
+    if (task.isCompleted) {
+      element.innerHTML = `<span>✅ #${task.id} - ${task.title}</span>`
+      element.style.textDecoration = 'line-through'
+      ui.tasksList.append(element)
+    }
+    else {
+      element.innerHTML = `<span>⬜ #${task.id} - ${task.title}</span>`
+      ui.tasksList.prepend(element)
+    }
+  })
+}
+
+const renderHistory = () => {
+  const { historyList } = ui
+
+  historyList.innerHTML = ''
+
+  if (state.history.length === 0) {
+    historyList.innerHTML = '<p>History is empty</p>'
+    return
+  }
+
+  const listElements = state.history.map((item) => {
+    const element = document.createElement('li')
+
+    element.innerHTML = `<span>${item}</span>`
+
+    return element
+  })
+
+  historyList.append(...listElements)
+}
+
+const renderForm = () => {
+  /** @type {HTMLFormElement} form */
+  const form = ui.form
+  const { formState } = state
+
+  /** @type {HTMLInputElement} titleElement */
+  const titleElement = form.elements.title
+
+  titleElement.value = formState.value
+
+  const helperTextElement = form.querySelector('small') || document.createElement('small')
+
+  helperTextElement.remove()
+
+  if (formState.isValid === undefined) {
+    titleElement.ariaInvalid = null
+
+    return
+  }
+
+  if (formState.isValid === false) {
+    titleElement.ariaInvalid = true
+    helperTextElement.innerText = formState.error
+  }
+  else if (formState.isValid === true) {
+    console.log('JOPAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
+    titleElement.ariaInvalid = false
+    helperTextElement.innerText = 'Success'
+  }
+
+  titleElement.parentElement.after(helperTextElement)
+}
+
+const renderProgress = () => {
+  const { tasks } = state
+
+  /** @type {HTMLProgressElement} progress */
+  const progress = ui.progress
+
+  progress.max = tasks.length
+  progress.value = tasks.filter(({ isCompleted }) => isCompleted).length
 }
 
 const render = () => {
-  const root = document.getElementById('app')
-  root.innerHTML = ''
-
-  /** @type HTMLFormElement */
-  const form = createTaskForm(state.form)
-
-  /** @type {HTMLInputElement} */
-  const titleInput = form.elements.title
-  titleInput.addEventListener('input', handleInput)
-
-  form.addEventListener('submit', handleSubmit)
-  root.appendChild(form)
-
-  const tasksList = createTasksList(state.tasks)
-  root.appendChild(tasksList)
+  renderForm()
+  renderTasks()
+  renderHistory()
+  renderProgress()
 }
 
 const initApp = () => {
+  ui.form = document.getElementById('create_task_form')
+  ui.tasksList = document.getElementById('tasks_list')
+  ui.historyList = document.getElementById('tasks_history_list')
+  ui.progress = document.getElementById('tasks_progress')
+
+  ui.form.elements.title.addEventListener('input', handleInput)
+  ui.form.addEventListener('submit', handleSubmit)
+
+  ui.tasksList.addEventListener('click', handleClick)
+
   render()
 }
 

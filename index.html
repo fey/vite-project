@@ -5,14 +5,44 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vite App</title>
-    <!-- Minified version -->
-    <link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <link rel="stylesheet" href="./src/style.css">
   </head>
-  <body>
+  <body class="container">
       <header>
         <h1>Tasks List</h1>
       </header>
-    <main id="app">
+      <main id="app">
+          <form action="#" id="create_task_form">
+            <label for="title">Task title</label>
+            <fieldset role="group">
+              <input
+                placeholder="Buy a milk"
+                aria-placeholder="Buy a milk"
+                aria-label="Title"
+                type="text"
+                name="title"
+                id="title"
+              >
+              <button type="submit">Submit</button>
+            </fieldset>
+          </form>
+        <section>
+          <h4>Progress</h4>
+          <progress value="0" max="0" id="tasks_progress"></progress>
+        </section>
+        <div class="grid">
+          <section id="tasks_wrapper">
+            <h3>Tasks</h3>
+            <ul id="tasks_list">
+            </ul>
+          </section>
+          <section>
+            <h3>History</h3>
+            <ul id="tasks_history_list">
+            </ul>
+          </section>
+        </div>
 
     </main>
   </body>
