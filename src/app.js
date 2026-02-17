@@ -102,20 +102,20 @@ const renderTasks = () => {
   const { tasks } = state
 
   tasks.forEach((task) => {
-    const element = document.createElement('li')
-    element.style.listStyleType = 'none'
-    element.dataset.id = task.id
-    element.dataset.type = 'task'
-    element.id = `task-${task.id}`
+    const listItemElement = document.createElement('li')
+    listItemElement.style.listStyleType = 'none'
+    listItemElement.dataset.id = task.id
+    listItemElement.dataset.type = 'task'
+    listItemElement.id = `task-${task.id}`
 
     if (task.isCompleted) {
-      element.innerHTML = `<span>✅ #${task.id} - ${task.title}</span>`
-      element.style.textDecoration = 'line-through'
-      ui.tasksList.append(element)
+      listItemElement.innerText = `✅ #${task.id} - ${task.title}`
+      listItemElement.style.textDecoration = 'line-through'
+      ui.tasksList.append(listItemElement)
     }
     else {
-      element.innerHTML = `<span>⬜ #${task.id} - ${task.title}</span>`
-      ui.tasksList.prepend(element)
+      listItemElement.innerText = `⬜ #${task.id} - ${task.title}`
+      ui.tasksList.prepend(listItemElement)
     }
   })
 }
