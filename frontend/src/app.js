@@ -190,6 +190,12 @@ const render = () => {
   renderProgress()
 }
 
+const checkApiStatus = () => {
+  return fetch('/api/health')
+    .then(resp => resp.json())
+    .then(response => response.status)
+}
+
 const initApp = () => {
   ui.form = document.getElementById('create_task_form')
   ui.tasksList = document.getElementById('tasks_list')
@@ -202,6 +208,7 @@ const initApp = () => {
   ui.tasksList.addEventListener('click', handleClick)
 
   render()
+  checkApiStatus().then((status) => console.log({ status }))
 }
 
 export default initApp
