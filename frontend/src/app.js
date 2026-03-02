@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { proxy, subscribe } from 'valtio/vanilla'
 
 const ui = {
   form: null,
@@ -6,7 +7,7 @@ const ui = {
   historyList: null,
   progress: null,
 }
-const state = {
+const state = proxy({
   formState: {
     value: '',
     isValid: undefined,
@@ -15,7 +16,7 @@ const state = {
   taskNextId: 1,
   tasks: [],
   history: [],
-}
+})
 
 const findTask = (tasks, id) => {
   return tasks.find(task => task.id === id)
@@ -31,7 +32,6 @@ const handleSubmit = (e) => {
   if (title === '') {
     state.formState.isValid = false
     state.formState.error = 'Title should be filled'
-    render()
     return
   }
 
@@ -50,7 +50,6 @@ const handleSubmit = (e) => {
       state.tasks.push(task)
       state.history.push('task added')
     })
-    .then(() => render())
 }
 
 const loadTasks = () => {
@@ -76,7 +75,6 @@ const handleInput = (e) => {
   state.formState.value = e.target.value
   state.formState.isValid = undefined
   state.formState.error = null
-  render()
 }
 
 const handleClick = (/** @type {PointerEvent} */ e) => {
@@ -109,7 +107,6 @@ const handleClick = (/** @type {PointerEvent} */ e) => {
       task.isCompleted = true
       history.push('task completed')
     })
-    .then(() => render())
 }
 
 const renderTasks = () => {
@@ -204,7 +201,6 @@ const renderProgress = () => {
 }
 
 const render = () => {
-  console.log('render')
   renderForm()
   renderTasks()
   renderHistory()
@@ -239,6 +235,11 @@ const initApp = () => {
     })
     .then(() => {
       render()
+
+      subscribe(state.formState, renderForm)
+      subscribe(state.history, renderHistory)
+      subscribe(state.tasks, renderProgress)
+      subscribe(state.tasks, renderTasks)
     })
 }
 
