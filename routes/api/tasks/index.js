@@ -1,8 +1,8 @@
 // @ts-check
 
-import { faker } from '@faker-js/faker';
+import { faker } from '@faker-js/faker'
 
-faker.seed(1);
+faker.seed(1)
 
 /**
  * @type {{}[]}
@@ -29,9 +29,8 @@ const addTask = ({ title }) => {
 
 for (let i = 0; i < 10; i++) {
   addTask({
-    title: faker.hacker.phrase()
+    title: faker.hacker.phrase(),
   })
-
 }
 
 /**
