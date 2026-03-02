@@ -43,8 +43,11 @@ const handleSubmit = (e) => {
       const { id, title, isCompleted } = data
       const task = { id, isCompleted, title }
 
+      state.formState.value = ''
+      state.formState.isValid = true
+      state.formState.error = null
+
       state.tasks.push(task)
-      resetFormState()
       state.history.push('task added')
     })
     .then(() => render())
@@ -53,12 +56,6 @@ const handleSubmit = (e) => {
 const loadTasks = () => {
   return axios
     .get('/api/tasks')
-}
-
-const resetFormState = () => {
-  state.formState.value = ''
-  state.formState.isValid = true
-  state.formState.error = null
 }
 
 const addTask = (taskData) => {
@@ -70,16 +67,8 @@ const addTask = (taskData) => {
 }
 
 const markTaskCompleted = (id) => {
-  const { tasks, history } = state
-
-  const task = findTask(tasks, id)
-
-  if (!task) {
-    return
-  }
-
-  task.isCompleted = true
-  history.push('task completed')
+  return axios
+    .patch(`/api/tasks/${id}/complete`)
 }
 
 /** @param {InputEvent} e */
@@ -108,7 +97,19 @@ const handleClick = (/** @type {PointerEvent} */ e) => {
   }
 
   markTaskCompleted(id)
-  render()
+    .then(() => {
+      const { tasks, history } = state
+
+      const task = findTask(tasks, id)
+
+      if (!task) {
+        return
+      }
+
+      task.isCompleted = true
+      history.push('task completed')
+    })
+    .then(() => render())
 }
 
 const renderTasks = () => {
@@ -157,7 +158,7 @@ const renderHistory = () => {
     return element
   })
 
-  historyList.append(...listElements)
+  historyList.append(...listElements.reverse())
 }
 
 const renderForm = () => {
