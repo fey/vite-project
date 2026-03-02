@@ -13,7 +13,7 @@ const findTask = (id) => {
 /**
  * @param {import('fastify').FastifyInstance} fastify
  */
-export default async (fastify, opts) => {
+export default async (fastify, _opts) => {
   fastify.get('/', async () => {
     return tasks
   })

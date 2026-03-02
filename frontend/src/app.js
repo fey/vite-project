@@ -1,4 +1,4 @@
-import axios from "axios"
+import axios from 'axios'
 
 const ui = {
   form: null,
@@ -37,13 +37,14 @@ const handleSubmit = (e) => {
 
   state.formState.isValid = true
   state.formState.error = null
+
   addTask({ title })
-    .then(data => {
+    .then((data) => {
       const { id, title, isCompleted } = data
       const task = { id, isCompleted, title }
 
       state.tasks.push(task)
-      resetFormState(state.formState)
+      resetFormState()
       state.history.push('task added')
     })
     .then(() => render())
@@ -54,7 +55,7 @@ const loadTasks = () => {
     .get('/api/tasks')
 }
 
-const resetFormState = (formState) => {
+const resetFormState = () => {
   state.formState.value = ''
   state.formState.isValid = true
   state.formState.error = null
@@ -62,7 +63,7 @@ const resetFormState = (formState) => {
 
 const addTask = (taskData) => {
   return axios
-    .post('/api/tasks', { ...taskData})
+    .post('/api/tasks', { ...taskData })
     .then(({ data }) => {
       return data
     })
@@ -89,8 +90,7 @@ const handleInput = (e) => {
   render()
 }
 
-/** @param {PointerEvent} e */
-const handleClick = (e) => {
+const handleClick = (/** @type {PointerEvent} */ e) => {
   e.preventDefault()
 
   const taskElement = e.target.closest('[data-type="task"]')
@@ -230,10 +230,11 @@ const initApp = () => {
       console.log(JSON.stringify({ api: { status, data } }))
       return loadTasks()
     })
-    .then(response => {
+    .then((response) => {
       // state.tasks = response.data
       console.log(response.data)
       state.tasks = (response.data)
+      state.history.push('tasks loaded')
     })
     .then(() => {
       render()
