@@ -1,3 +1,8 @@
+// @ts-check
+
+/**
+ * @type {{}[]}
+ */
 const tasks = []
 let taskNextId = 1
 
@@ -5,20 +10,14 @@ const findTask = (id) => {
   return tasks.find(task => task.id === id)
 }
 
-/** @param {import("fastify").FastifyInstance} fastify  */
+/**
+ * @param {import('fastify').FastifyInstance} fastify
+ */
 export default async (fastify, opts) => {
-  /**
-   * @param {import("fastify/types/request").RequestGenericInterface} request
-   * @param {import("fastify/types/reply").ReplyGenericInterface} reply
-   */
-  fastify.get('/', async (request, reply) => {
+  fastify.get('/', async () => {
     return tasks
   })
 
-  /**
-   * @param {import("fastify/types/request").RequestGenericInterface} request
-   * @param {import("fastify/types/reply").ReplyGenericInterface} reply
-   */
   fastify.post('/', async (request, reply) => {
     const { title } = request.body
 
@@ -31,14 +30,12 @@ export default async (fastify, opts) => {
     tasks.push(task)
     taskNextId++
 
+    console.log(task)
+
     reply.status(201)
     reply.send(task)
   })
 
-  /**
-   * @param {import("fastify/types/request").RequestGenericInterface} request
-   * @param {import("fastify/types/reply").ReplyGenericInterface} reply
-   */
   fastify.patch('/:id/complete', async (request, reply) => {
     const { id } = request.params
 

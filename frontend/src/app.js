@@ -1,3 +1,5 @@
+import axios from "axios"
+
 const ui = {
   form: null,
   tasksList: null,
@@ -29,24 +31,41 @@ const handleSubmit = (e) => {
   if (title === '') {
     state.formState.isValid = false
     state.formState.error = 'Title should be filled'
-  }
-  else {
-    state.formState.isValid = true
-    state.formState.error = null
-    addTask({ title })
+    render()
+    return
   }
 
-  render()
+  state.formState.isValid = true
+  state.formState.error = null
+  addTask({ title })
+    .then(data => {
+      const { id, title, isCompleted } = data
+      const task = { id, isCompleted, title }
+
+      state.tasks.push(task)
+      resetFormState(state.formState)
+      state.history.push('task added')
+    })
+    .then(() => render())
 }
 
-const addTask = (taskData) => {
-  state.tasks.push({ ...taskData, id: state.taskNextId })
-  state.taskNextId++
+const loadTasks = () => {
+  return axios
+    .get('/api/tasks')
+}
+
+const resetFormState = (formState) => {
   state.formState.value = ''
   state.formState.isValid = true
   state.formState.error = null
+}
 
-  state.history.push('task added')
+const addTask = (taskData) => {
+  return axios
+    .post('/api/tasks', { ...taskData})
+    .then(({ data }) => {
+      return data
+    })
 }
 
 const markTaskCompleted = (id) => {
@@ -184,6 +203,7 @@ const renderProgress = () => {
 }
 
 const render = () => {
+  console.log('render')
   renderForm()
   renderTasks()
   renderHistory()
@@ -191,9 +211,7 @@ const render = () => {
 }
 
 const checkApiStatus = () => {
-  return fetch('/api/health')
-    .then(resp => resp.json())
-    .then(response => response.status)
+  return axios.get('/api/health')
 }
 
 const initApp = () => {
@@ -207,8 +225,19 @@ const initApp = () => {
 
   ui.tasksList.addEventListener('click', handleClick)
 
-  render()
-  checkApiStatus().then((status) => console.log({ status }))
+  checkApiStatus()
+    .then(({ status, data }) => {
+      console.log(JSON.stringify({ api: { status, data } }))
+      return loadTasks()
+    })
+    .then(response => {
+      // state.tasks = response.data
+      console.log(response.data)
+      state.tasks = (response.data)
+    })
+    .then(() => {
+      render()
+    })
 }
 
 export default initApp
