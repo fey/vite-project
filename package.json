@@ -19,6 +19,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@faker-js/faker": "^10.3.0",
     "@stylistic/eslint-plugin": "^5.9.0",
     "concurrently": "^9.2.1",
     "eslint": "^10.0.2",
