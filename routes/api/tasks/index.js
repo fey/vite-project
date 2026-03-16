@@ -46,8 +46,6 @@ export default async (fastify, _opts) => {
 
     const task = addTask({ title })
 
-    console.log(task)
-
     reply.status(201)
     reply.send(task)
   })
@@ -57,11 +55,11 @@ export default async (fastify, _opts) => {
 
     const task = findTask(Number(id))
 
-    task.isCompleted = true
-
     if (!task) {
       return reply.notFound()
     }
+
+    task.isCompleted = true
 
     reply.status(204)
   })

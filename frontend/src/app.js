@@ -13,7 +13,6 @@ const state = proxy({
     isValid: undefined,
     error: null,
   },
-  taskNextId: 1,
   tasks: [],
   history: [],
 })
@@ -27,9 +26,9 @@ const handleSubmit = (e) => {
   e.preventDefault()
 
   const formData = new FormData(e.target)
-  const title = formData.get('title')
+  const title = String(formData.get('title') || '').trim()
 
-  if (title === '') {
+  if (!title) {
     state.formState.isValid = false
     state.formState.error = 'Title should be filled'
     return
@@ -49,6 +48,11 @@ const handleSubmit = (e) => {
 
       state.tasks.push(task)
       state.history.push('task added')
+    })
+    .catch(() => {
+      state.formState.isValid = false
+      state.formState.error = 'Could not add task. Try again.'
+      state.history.push('failed to add task')
     })
 }
 
@@ -81,12 +85,17 @@ const handleClick = (/** @type {PointerEvent} */ e) => {
   e.preventDefault()
 
   const taskElement = e.target.closest('[data-type="task"]')
+
+  if (!taskElement) {
+    return
+  }
+
   const id = Number(taskElement.dataset.id)
 
   const { tasks } = state
   const task = findTask(tasks, id)
 
-  if (task.isCompleted) {
+  if (!task || task.isCompleted) {
     return
   }
 
@@ -106,6 +115,9 @@ const handleClick = (/** @type {PointerEvent} */ e) => {
 
       task.isCompleted = true
       history.push('task completed')
+    })
+    .catch(() => {
+      state.history.push('failed to complete task')
     })
 }
 
@@ -228,10 +240,11 @@ const initApp = () => {
       return loadTasks()
     })
     .then((response) => {
-      // state.tasks = response.data
-      console.log(response.data)
-      state.tasks = (response.data)
+      state.tasks = response.data
       state.history.push('tasks loaded')
+    })
+    .catch(() => {
+      state.history.push('failed to load tasks')
     })
     .then(() => {
       render()
